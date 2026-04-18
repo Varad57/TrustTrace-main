@@ -1,0 +1,22 @@
+# Node / Hardhat
+node_modules/
+MilestoneEscrow/node_modules/
+MilestoneEscrow/raw_e2e/node_modules/
+MilestoneEscrow/artifacts/
+MilestoneEscrow/cache/
+MilestoneEscrow/ignition/deployments/
+
+# Go (compiled binaries only)
+/AuditBackend/server
+!/AuditBackend/cmd/server/
+
+# Python
+AuditBackend/venv/
+AuditBackend/venv10/
+AuditBackend/tenseal_service/venv/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+*.log

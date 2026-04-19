@@ -11,7 +11,7 @@ def main():
     # 1. Register Public Context
     user_id = "alice"
     public_context = context.serialize(save_secret_key=False)
-    requests.post("http://127.0.0.1:8080/register", json={
+    requests.post("http://host.docker.internal:8080/register", json={
         "user_id": user_id,
         "context": base64.b64encode(public_context).decode('utf-8')
     })
@@ -23,7 +23,7 @@ def main():
     enc_bal = ts.ckks_vector(context, balance)
     bal_bytes = enc_bal.serialize()
     
-    requests.post("http://127.0.0.1:8080/balance", json={
+    requests.post("http://host.docker.internal:8080/balance", json={
         "user_id": user_id,
         "balance": base64.b64encode(bal_bytes).decode('utf-8')
     })
@@ -32,7 +32,7 @@ def main():
     # 3. Third-Party Verify via Go
     threshold = 3000.00
     print(f"\n[Client] Third-party triggers Zero-Knowledge check: Is {user_id}'s balance >= ${threshold}?")
-    resp = requests.get(f"http://127.0.0.1:8080/verify_balance?user_id={user_id}&threshold={threshold}")
+    resp = requests.get(f"http://host.docker.internal:8080/verify_balance?user_id={user_id}&threshold={threshold}")
     
     res_b64 = resp.json()["result_vector"]
     print("[Client] Received Encrypted Difference vector from Go backend (which secretly called Python).")

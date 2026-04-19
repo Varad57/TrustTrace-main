@@ -15,7 +15,9 @@ fi
 echo "Retrieved SHA-256 Hash from Go Engine: $LATEST_HASH"
 
 echo -e "\n=== Step 3: Hash Pushed to Blockchain ==="
-cd "$(dirname "$0")/MilestoneEscrow/raw_e2e"
+cd "$(dirname "$0")/MilestoneEscrow"
+npx hardhat compile > /dev/null
+cd raw_e2e
 export LATEST_HASH=$LATEST_HASH
 node push.js
 

@@ -5,6 +5,8 @@ import Button from '../components/ui/Button'
 import { SkeletonList } from '../components/ui/Loader'
 import { useToast } from '../components/ui/Toast'
 import AddExpense from '../components/AddExpense'
+import ExpenseCard from '../components/ExpenseCard'
+import ProofModal from '../components/ProofModal'
 import { getLedger } from '../services/api'
 
 const stagger = {
@@ -15,10 +17,48 @@ const stagger = {
   },
 }
 
+// Mock verified expenses visible to investors
+const VERIFIED_EXPENSES = [
+  {
+    id: 101,
+    description: 'AWS Cloud Infrastructure',
+    amount: '$12,400',
+    timestamp: 'Apr 18, 2026 — 3:42 PM',
+    hash: '0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+    prevHash: '0xa1f8e23408ba1c43d9f2c91b7a8fd32e1c0b5a7d6e9f3c2a4b8d6e1f3c5a7b9d',
+    receiptUrl: null,
+    receiptName: null,
+    status: 'Verified',
+  },
+  {
+    id: 102,
+    description: 'Legal Consultation — Series A',
+    amount: '$15,000',
+    timestamp: 'Apr 16, 2026 — 9:30 AM',
+    hash: '0xa1f8e23408ba1c43d9f2c91b7a8fd32e1c0b5a7d6e9f3c2a4b8d6e1f3c5a7b9d',
+    prevHash: '0xf2d8c36618bc2a23b7e91c4d5a8f3b6e2d9c1a4f7b8e3d6c9a2f5b8e1d4c7a0',
+    receiptUrl: null,
+    receiptName: null,
+    status: 'Verified',
+  },
+  {
+    id: 103,
+    description: 'Marketing Campaign — Q1',
+    amount: '$28,000',
+    timestamp: 'Apr 15, 2026 — 2:18 PM',
+    hash: '0xb4c9d72a10fe3e88a5d2f71c83e9b046d1a7c3f5e8b2d6a9c4f1e7b0d3a6c9f2',
+    prevHash: '0xa1f8e23408ba1c43d9f2c91b7a8fd32e1c0b5a7d6e9f3c2a4b8d6e1f3c5a7b9d',
+    receiptUrl: null,
+    receiptName: null,
+    status: 'Verified',
+  },
+]
+
 export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [ledger, setLedger] = useState([])
   const [refreshKey, setRefreshKey] = useState(0)
+  const [proofExpense, setProofExpense] = useState(null)
   const showToast = useToast()
 
   const fetchLedger = useCallback(async () => {
@@ -142,6 +182,52 @@ export default function Dashboard() {
           </div>
         )}
       </motion.div>
+
+      {/* ── Verified Expenses (Investor View) ── */}
+      <motion.div variants={stagger.item}>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-text-primary">Verified Expenses</h3>
+          <span className="text-[10px] font-bold text-accent-green bg-accent-green/10 px-2 py-0.5 rounded">{VERIFIED_EXPENSES.length} Verified</span>
+        </div>
+
+        {/* Mini hash chain */}
+        <div className="flex items-center gap-1 mb-3 overflow-x-auto pb-1">
+          {VERIFIED_EXPENSES.slice(0, 3).map((exp, i) => (
+            <div key={exp.id} className="flex items-center gap-1 shrink-0">
+              <div className="text-[8px] font-mono px-2 py-1 rounded-lg border bg-dark-surface border-accent-blue/30 text-accent-blue">
+                #{i + 1}
+              </div>
+              {i < 2 && (
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-2.5">
+          {VERIFIED_EXPENSES.map((expense, i) => (
+            <motion.div
+              key={expense.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.04 }}
+            >
+              <ExpenseCard
+                expense={expense}
+                variant="investor"
+                onViewProof={(exp) => setProofExpense(exp)}
+              />
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Proof Modal */}
+      <ProofModal
+        isOpen={!!proofExpense}
+        onClose={() => setProofExpense(null)}
+        expense={proofExpense}
+      />
     </motion.div>
   )
 }

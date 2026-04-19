@@ -124,7 +124,7 @@ func (h *Handler) VerifyBalance(w http.ResponseWriter, r *http.Request) {
 		"threshold": threshold,
 	})
 
-	resp, err := http.Post("http://127.0.0.1:5000/compute_diff", "application/json", bytes.NewBuffer(proxyBody))
+	resp, err := http.Post("http://127.0.0.1:5001/compute_diff", "application/json", bytes.NewBuffer(proxyBody))
 	if err != nil {
 		http.Error(w, "microservice unavailable", http.StatusInternalServerError)
 		return

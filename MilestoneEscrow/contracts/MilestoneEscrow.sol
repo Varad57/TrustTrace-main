@@ -3,9 +3,12 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+import "./Verifier.sol";
+
 contract MilestoneEscrow is ReentrancyGuard {
 
     address public immutable beneficiary;
+    Verifier public verifier;
 
     uint256 public totalDeposits;
     mapping(address => uint256) public deposits;
@@ -37,10 +40,14 @@ contract MilestoneEscrow is ReentrancyGuard {
     constructor(
         address _beneficiary,
         bytes32[] memory _referenceHashes,
-        uint8[] memory _percentages
+        uint8[] memory _percentages,
+        address _verifierAddress
     ) {
         require(_beneficiary != address(0), "Invalid beneficiary");
+        require(_verifierAddress != address(0), "Invalid verifier");
         require(_referenceHashes.length == _percentages.length, "Array mismatch");
+
+        verifier = Verifier(_verifierAddress);
 
         uint16 totalPercentage = 0;
 
@@ -97,15 +104,34 @@ contract MilestoneEscrow is ReentrancyGuard {
         emit Voted(msg.sender, _milestoneId, weight);
     }
 
+    // -------------------- ZKP VERIFICATION --------------------
+
+    function verifyEligibility(
+        uint256[2] calldata _pA,
+        uint256[2][2] calldata _pB,
+        uint256[2] calldata _pC,
+        uint256[2] calldata _pubSignals
+    ) public view returns (bool) {
+        return verifier.verifyProof(_pA, _pB, _pC, _pubSignals);
+    }
+
     // -------------------- RELEASE --------------------
 
-    function releaseFunds() external nonReentrant {
+    function releaseFunds(
+        uint256[2] calldata _pA,
+        uint256[2][2] calldata _pB,
+        uint256[2] calldata _pC,
+        uint256[2] calldata _pubSignals
+    ) external nonReentrant {
         require(currentMilestone < milestones.length, "All done");
 
         Milestone storage milestone = milestones[currentMilestone];
         require(!milestone.released, "Already released");
 
-        // 🔐 CORE: backend proof verification
+        // 🔐 ZKP CORE: verify off-chain generated SNARK proof
+        require(verifier.verifyProof(_pA, _pB, _pC, _pubSignals), "ZKP verification failed");
+
+        // 🔐 HASH CORE: backend proof verification
         require(
             milestone.referenceHash == latestExpenseHash,
             "Hash mismatch"

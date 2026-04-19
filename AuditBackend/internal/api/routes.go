@@ -10,8 +10,6 @@ func SetupRoutes(h *Handler) *http.ServeMux {
 	
 	mux.HandleFunc("/expense", h.CreateExpense)
 	mux.HandleFunc("/ledger", h.GetLedger)
-	mux.HandleFunc("/register", h.RegisterUser)
-	mux.HandleFunc("/balance", h.UpdateBalance)
 	mux.HandleFunc("/verify_balance", h.VerifyBalance)
 	
 	return mux

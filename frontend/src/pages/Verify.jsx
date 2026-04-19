@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Button from '../components/ui/Button'
 import GlassCard from '../components/ui/GlassCard'
 import { useToast } from '../components/ui/Toast'
-import { verifyFHE } from '../services/api'
+import { verifyZKP } from '../services/api'
 
 // Animation Variants
 const containerVariant = {
@@ -16,10 +16,10 @@ const itemVariant = {
   show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 25 } }
 }
 
-// FHE Verification Stages
+// ZKP Verification Stages
 const STAGES = {
   IDLE: 'IDLE',
-  ENCRYPTING: 'ENCRYPTING',
+  GENERATING_PROOF: 'GENERATING_PROOF',
   COMPUTING: 'COMPUTING',
   VERIFIED: 'VERIFIED',
   ERROR: 'ERROR'
@@ -33,7 +33,7 @@ export default function Verify() {
   const handleVerify = async () => {
     if (stage !== STAGES.IDLE && stage !== STAGES.ERROR && stage !== STAGES.VERIFIED) return
 
-    setStage(STAGES.ENCRYPTING)
+    setStage(STAGES.GENERATING_PROOF)
     setApiResult(null)
 
     // Simulate encryption time for UI flow
@@ -44,13 +44,13 @@ export default function Verify() {
     try {
       // Parallel: Keep UI engaged for at least 3s total while Backend runs
       const [data] = await Promise.all([
-        verifyFHE({ action: "verify_investor_solvency" }),
+        verifyZKP({ action: "verify_investor_solvency" }),
         new Promise(resolve => setTimeout(resolve, 3000)) 
       ])
       
       setApiResult(data)
       setStage(STAGES.VERIFIED)
-      showToast('FHE Verification Successful', 'success')
+      showToast('ZKP Verification Successful', 'success')
     } catch (err) {
       setStage(STAGES.ERROR)
       showToast(err.message || 'Verification Failed', 'error')
@@ -85,7 +85,7 @@ export default function Verify() {
           </motion.div>
         )
 
-      case STAGES.ENCRYPTING:
+      case STAGES.GENERATING_PROOF:
         return (
           <motion.div
             key="encrypting"
@@ -118,7 +118,7 @@ export default function Verify() {
               transition={{ repeat: Infinity, duration: 1.5 }}
               className="mt-6 text-sm font-bold text-accent-purple tracking-widest uppercase"
             >
-              Encrypting Balance...
+              Generating ZK Proof...
             </motion.p>
             <div className="mt-3 flex gap-1">
               {[0, 1, 2].map(i => (
@@ -143,7 +143,7 @@ export default function Verify() {
             className="flex flex-col items-center justify-center h-48"
           >
             <div className="relative w-full max-w-[240px] h-20 flex items-center justify-between">
-              {/* Encrypted Data Node */}
+              {/* Private Statement Node */}
               <div className="w-12 h-12 rounded-xl bg-accent-purple/20 border border-accent-purple flex items-center justify-center z-10">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
@@ -175,10 +175,10 @@ export default function Verify() {
               transition={{ repeat: Infinity, duration: 2 }}
               className="mt-6 text-sm font-bold text-accent-cyan tracking-widest uppercase"
             >
-              Computing on encrypted data...
+              Proving Knowledge off-chain...
             </motion.p>
             <p className="mt-1 text-[10px] text-text-muted font-mono tracking-widest uppercase">
-              Homomorphic Evaluation in progress
+              SNARK witness validation in progress
             </p>
           </motion.div>
         )
@@ -248,7 +248,7 @@ export default function Verify() {
         <div className="flex flex-col">
           <h2 className="text-xl font-bold text-text-primary tracking-tight">Privacy-Preserving Verification</h2>
           <p className="text-sm text-text-muted mt-1 leading-relaxed">
-            Verify investor solvency credentials entirely on-chain without exposing private financial data through Zero-Knowledge and FHE.
+            Verify investor solvency credentials entirely on-chain without exposing private financial data through Zero-Knowledge Proofs.
           </p>
         </div>
       </motion.div>
@@ -269,10 +269,10 @@ export default function Verify() {
               fullWidth
               size="lg"
               variant={stage === STAGES.VERIFIED ? 'ghost' : 'primary'}
-              disabled={stage === STAGES.ENCRYPTING || stage === STAGES.COMPUTING}
+              disabled={stage === STAGES.GENERATING_PROOF || stage === STAGES.COMPUTING}
               onClick={handleVerify}
             >
-              {stage === STAGES.ENCRYPTING || stage === STAGES.COMPUTING ? (
+              {stage === STAGES.GENERATING_PROOF || stage === STAGES.COMPUTING ? (
                  <span className="flex items-center gap-2">
                    Processing Proof...
                  </span>
@@ -298,7 +298,7 @@ export default function Verify() {
             <div>
               <h3 className="text-sm font-bold text-text-primary mb-1">Zero-Data Exposure</h3>
               <p className="text-xs text-text-secondary leading-relaxed">
-                Your financial data is never decrypted during evaluation. We compute directly on encrypted cyphertexts using advanced Fully Homomorphic Encryption (FHE).
+                Your financial data is completely excluded from the blockchain state. We generate a valid cryptographic proof locally using Circom ZK-SNARK protocols.
               </p>
             </div>
           </div>

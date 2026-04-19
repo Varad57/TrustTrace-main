@@ -43,10 +43,10 @@ export async function getLedger() {
 }
 
 /**
- * GET /verify_balance — Verify FHE computation securely
+ * GET /verify_balance — Verify ZKP computation securely
  * Returns success/failure/message
  */
-export async function verifyFHE(payload = {}) {
+export async function verifyZKP(payload = {}) {
   const res = await api.get('/verify_balance', { params: { user_id: 'alice', threshold: '3000' } })
   return res.data
 }

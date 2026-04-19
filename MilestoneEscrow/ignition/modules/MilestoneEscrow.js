@@ -12,11 +12,14 @@ export default buildModule("MilestoneEscrowModule", (m) => {
   const referenceHashes = m.getParameter("referenceHashes", DEFAULT_HASHES);
   const percentages = m.getParameter("percentages", [20, 30, 50]);
 
+  const verifier = m.contract("Groth16Verifier");
+
   const escrow = m.contract("MilestoneEscrow", [
     beneficiary,
     referenceHashes,
-    percentages
+    percentages,
+    verifier
   ]);
 
-  return { escrow };
+  return { verifier, escrow };
 });

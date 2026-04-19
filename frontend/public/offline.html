@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>TrustTrace — Offline</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0B0F1A;
+      color: #F1F5F9;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .container { max-width: 320px; }
+    .icon { font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.6; }
+    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; }
+    p { color: #94A3B8; font-size: 0.9rem; line-height: 1.6; }
+    .btn {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 0.875rem 2rem;
+      background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+      color: white;
+      border: none;
+      border-radius: 1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📡</div>
+    <h1>You're Offline</h1>
+    <p>TrustTrace needs an internet connection to sync your audit data securely. Please reconnect and try again.</p>
+    <a href="/" class="btn">Retry</a>
+  </div>
+</body>
+</html>
